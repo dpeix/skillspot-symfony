@@ -9,11 +9,8 @@ enum WorkshopMode: string
     case Onsite = 'onsite';
     case Online = 'online';
 
-    public function label(): string
+    public function labelKey(): string
     {
-        return match ($this) {
-            self::Onsite => 'Sur place',
-            self::Online => 'En visioconférence',
-        };
+        return 'enum.workshop_mode.'.$this->value;
     }
 }

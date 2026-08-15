@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support;
 
 use App\Identity\Domain\Entity\User;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Workshop\Domain\Entity\Workshop;
 use App\Workshop\Domain\Entity\WorkshopSession;
 use App\Workshop\Domain\Enum\WorkshopCategory;
@@ -23,14 +24,25 @@ trait DomainFactory
 
     private function workshop(?User $owner = null): Workshop
     {
-        return new Workshop(
+        $workshop = new Workshop(
             $owner ?? $this->user(),
-            'A useful workshop',
-            'a-useful-workshop',
-            'A sufficiently detailed workshop description that clearly explains the learning outcomes and practical exercises.',
             WorkshopCategory::Development,
             WorkshopLevel::Intermediate,
         );
+        $workshop->addTranslation(
+            SupportedLocale::French,
+            'Un atelier utile',
+            'un-atelier-utile',
+            'Une description suffisamment détaillée qui présente clairement les objectifs pédagogiques et les exercices pratiques proposés.',
+        );
+        $workshop->addTranslation(
+            SupportedLocale::English,
+            'A useful workshop',
+            'a-useful-workshop',
+            'A sufficiently detailed workshop description that clearly explains the learning outcomes and practical exercises.',
+        );
+
+        return $workshop;
     }
 
     private function session(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Workshop\Domain\Entity;
 
 use App\Identity\Domain\Entity\User;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Shared\Domain\Exception\BusinessRuleViolation;
 use App\Workshop\Domain\Enum\WorkshopCategory;
 use App\Workshop\Domain\Enum\WorkshopLevel;
@@ -17,7 +18,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: WorkshopRepository::class)]
 #[ORM\Table(name: 'workshop')]
-#[ORM\UniqueConstraint(name: 'uniq_workshop_slug', columns: ['slug'])]
 class Workshop
 {
     #[ORM\Id]
@@ -28,15 +28,6 @@ class Workshop
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $owner;
-
-    #[ORM\Column(length: 160)]
-    private string $title;
-
-    #[ORM\Column(length: 190)]
-    private string $slug;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private string $description;
 
     #[ORM\Column(length: 30, enumType: WorkshopCategory::class)]
     private WorkshopCategory $category;
@@ -50,6 +41,10 @@ class Workshop
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
+    /** @var Collection<string, WorkshopTranslation> */
+    #[ORM\OneToMany(mappedBy: 'workshop', targetEntity: WorkshopTranslation::class, cascade: ['persist'], orphanRemoval: true, indexBy: 'locale')]
+    private Collection $translations;
+
     /** @var Collection<int, WorkshopSession> */
     #[ORM\OneToMany(mappedBy: 'workshop', targetEntity: WorkshopSession::class, cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['startsAt' => 'ASC'])]
@@ -57,24 +52,15 @@ class Workshop
 
     public function __construct(
         User $owner,
-        string $title,
-        string $slug,
-        string $description,
         WorkshopCategory $category,
         WorkshopLevel $level,
         ?\DateTimeImmutable $createdAt = null,
     ) {
-        if (mb_strlen(trim($title)) < 5 || mb_strlen(trim($description)) < 80) {
-            throw new BusinessRuleViolation('Le titre ou la description de l’atelier est trop court.');
-        }
-
         $this->owner = $owner;
-        $this->title = trim($title);
-        $this->slug = $slug;
-        $this->description = trim($description);
         $this->category = $category;
         $this->level = $level;
         $this->createdAt = $createdAt ?? new \DateTimeImmutable();
+        $this->translations = new ArrayCollection();
         $this->sessions = new ArrayCollection();
     }
 
@@ -90,17 +76,17 @@ class Workshop
 
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->translation(SupportedLocale::French)->getTitle();
     }
 
     public function getSlug(): string
     {
-        return $this->slug;
+        return $this->translation(SupportedLocale::French)->getSlug();
     }
 
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->translation(SupportedLocale::French)->getDescription();
     }
 
     public function getCategory(): WorkshopCategory
@@ -128,6 +114,61 @@ class Workshop
         $this->status = WorkshopStatus::from($status)->value;
     }
 
+    /** @return Collection<string, WorkshopTranslation> */
+    public function getTranslations(): Collection
+    {
+        return $this->translations;
+    }
+
+    public function addTranslation(
+        SupportedLocale $locale,
+        string $title,
+        string $slug,
+        string $description,
+    ): void {
+        if ($this->hasTranslation($locale)) {
+            throw new BusinessRuleViolation('workshop.error.duplicate_translation');
+        }
+
+        $this->translations->set($locale->value, new WorkshopTranslation($this, $locale, $title, $slug, $description));
+    }
+
+    public function updateTranslation(SupportedLocale $locale, string $title, string $description): void
+    {
+        if (WorkshopStatus::Archived === $this->getStatus()) {
+            throw new BusinessRuleViolation('workshop.error.archived');
+        }
+
+        $this->translation($locale)->update($title, $description);
+    }
+
+    public function translation(SupportedLocale|string $locale): WorkshopTranslation
+    {
+        $locale = $locale instanceof SupportedLocale ? $locale : SupportedLocale::fromString($locale);
+        $translation = $this->translations->get($locale->value);
+        if (!$translation instanceof WorkshopTranslation) {
+            throw new BusinessRuleViolation('workshop.error.missing_translation', ['%locale%' => $locale->value]);
+        }
+
+        return $translation;
+    }
+
+    public function hasTranslation(SupportedLocale $locale): bool
+    {
+        return $this->translations->get($locale->value) instanceof WorkshopTranslation;
+    }
+
+    public function hasAllTranslations(): bool
+    {
+        foreach (SupportedLocale::cases() as $locale) {
+            if (!$this->hasTranslation($locale)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /** @return Collection<int, WorkshopSession> */
     public function getSessions(): Collection
     {
@@ -137,7 +178,7 @@ class Workshop
     public function addSession(WorkshopSession $session): void
     {
         if ($session->getWorkshop() !== $this) {
-            throw new BusinessRuleViolation('La session doit appartenir à cet atelier.');
+            throw new BusinessRuleViolation('workshop.error.invalid_session_owner');
         }
 
         if (!$this->sessions->contains($session)) {
@@ -156,22 +197,12 @@ class Workshop
         return false;
     }
 
-    public function updateDetails(
-        string $title,
-        string $description,
-        WorkshopCategory $category,
-        WorkshopLevel $level,
-    ): void {
+    public function updateClassification(WorkshopCategory $category, WorkshopLevel $level): void
+    {
         if (WorkshopStatus::Archived === $this->getStatus()) {
-            throw new BusinessRuleViolation('Un atelier archivé ne peut plus être modifié.');
+            throw new BusinessRuleViolation('workshop.error.archived');
         }
 
-        if (mb_strlen(trim($title)) < 5 || mb_strlen(trim($description)) < 80) {
-            throw new BusinessRuleViolation('Le titre ou la description de l’atelier est trop court.');
-        }
-
-        $this->title = trim($title);
-        $this->description = trim($description);
         $this->category = $category;
         $this->level = $level;
     }

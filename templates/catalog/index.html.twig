@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
-{% block title %}Les ateliers — SkillSpot{% endblock %}
+{% block title %}{{ 'catalog.title'|trans }}{% endblock %}
 {% block body %}
-<section class="dashboard-header"><div class="container"><p class="eyebrow">Catalogue</p><h1>Trouvez votre prochain atelier</h1><p class="hero-copy">Filtrez par sujet, niveau, format ou date.</p></div></section>
+<section class="dashboard-header"><div class="container"><p class="eyebrow">{{ 'catalog.eyebrow'|trans }}</p><h1>{{ 'catalog.heading'|trans }}</h1><p class="hero-copy">{{ 'catalog.intro'|trans }}</p></div></section>
 <section class="section" style="padding-top:1rem"><div class="container">
     <form class="filter-panel filter-grid" method="get">
-        <div class="form-row"><label for="category">Catégorie</label><select class="form-control" id="category" name="category"><option value="">Toutes</option>{% for category in categories %}<option value="{{ category.value }}" {{ filters.category|default == category.value ? 'selected' }}>{{ category.label }}</option>{% endfor %}</select></div>
-        <div class="form-row"><label for="level">Niveau</label><select class="form-control" id="level" name="level"><option value="">Tous</option>{% for level in levels %}<option value="{{ level.value }}" {{ filters.level|default == level.value ? 'selected' }}>{{ level.label }}</option>{% endfor %}</select></div>
-        <div class="form-row"><label for="mode">Modalité</label><select class="form-control" id="mode" name="mode"><option value="">Toutes</option>{% for mode in modes %}<option value="{{ mode.value }}" {{ filters.mode|default == mode.value ? 'selected' }}>{{ mode.label }}</option>{% endfor %}</select></div>
-        <div class="form-row"><label for="date">Date</label><input class="form-control" id="date" type="date" name="date" value="{{ filters.date|default }}"></div>
-        <button class="button" type="submit">Filtrer</button>
+        <div class="form-row"><label for="category">{{ 'catalog.category'|trans }}</label><select class="form-control" id="category" name="category"><option value="">{{ 'common.all_feminine'|trans }}</option>{% for category in categories %}<option value="{{ category.value }}" {{ filters.category|default == category.value ? 'selected' }}>{{ category.labelKey|trans }}</option>{% endfor %}</select></div>
+        <div class="form-row"><label for="level">{{ 'catalog.level'|trans }}</label><select class="form-control" id="level" name="level"><option value="">{{ 'common.all_masculine'|trans }}</option>{% for level in levels %}<option value="{{ level.value }}" {{ filters.level|default == level.value ? 'selected' }}>{{ level.labelKey|trans }}</option>{% endfor %}</select></div>
+        <div class="form-row"><label for="mode">{{ 'catalog.mode'|trans }}</label><select class="form-control" id="mode" name="mode"><option value="">{{ 'common.all_feminine'|trans }}</option>{% for mode in modes %}<option value="{{ mode.value }}" {{ filters.mode|default == mode.value ? 'selected' }}>{{ mode.labelKey|trans }}</option>{% endfor %}</select></div>
+        <div class="form-row"><label for="date">{{ 'catalog.date'|trans }}</label><input class="form-control" id="date" type="date" name="date" value="{{ filters.date|default }}"></div>
+        <button class="button" type="submit">{{ 'common.filter'|trans }}</button>
     </form>
-    {% if workshops %}<div class="workshop-grid">{% for workshop in workshops %}<twig:WorkshopCard :workshop="workshop" />{% endfor %}</div>{% else %}<div class="empty-state"><h3>Aucun atelier ne correspond</h3><p>Essayez de retirer un filtre.</p><a href="{{ path('workshop_catalog') }}">Réinitialiser les filtres</a></div>{% endif %}
+    {% if workshops %}<div class="workshop-grid">{% for workshop in workshops %}<twig:WorkshopCard :workshop="workshop" />{% endfor %}</div>{% else %}<div class="empty-state"><h3>{{ 'catalog.no_result'|trans }}</h3><p>{{ 'catalog.no_result_help'|trans }}</p><a href="{{ path('workshop_catalog') }}">{{ 'catalog.reset'|trans }}</a></div>{% endif %}
 </div></section>
 {% endblock %}

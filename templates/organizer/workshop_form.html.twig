@@ -1,1 +1,7 @@
-{% extends 'base.html.twig' %}{% block title %}{{ title }} — SkillSpot{% endblock %}{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">Espace organisateur</p><h1>{{ title }}</h1><p class="muted">Une description précise aide les participants à choisir en confiance.</p>{{ form_start(form) }}{{ form_widget(form) }}<button class="button">Enregistrer l’atelier</button>{{ form_end(form) }}</div></section>{% endblock %}
+{% extends 'base.html.twig' %}
+{% block title %}{{ title|trans }} — SkillSpot{% endblock %}
+{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">{{ 'organizer.dashboard.eyebrow'|trans }}</p><h1>{{ title|trans }}</h1><p class="muted">{{ 'workshop.form.intro'|trans }}</p>{{ form_start(form) }}
+    <fieldset><legend>🇫🇷 {{ 'workshop.form.french_section'|trans }}</legend>{{ form_row(form.titleFr) }}{{ form_row(form.descriptionFr) }}</fieldset>
+    <fieldset><legend>🇬🇧 {{ 'workshop.form.english_section'|trans }}</legend>{{ form_row(form.titleEn) }}{{ form_row(form.descriptionEn) }}</fieldset>
+    {{ form_row(form.category) }}{{ form_row(form.level) }}
+    <button class="button">{{ 'workshop.form.submit'|trans }}</button>{{ form_end(form) }}</div></section>{% endblock %}

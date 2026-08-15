@@ -12,14 +12,8 @@ enum WorkshopCategory: string
     case Product = 'product';
     case Career = 'career';
 
-    public function label(): string
+    public function labelKey(): string
     {
-        return match ($this) {
-            self::Development => 'Développement',
-            self::Design => 'Design',
-            self::Data => 'Data',
-            self::Product => 'Produit',
-            self::Career => 'Carrière',
-        };
+        return 'enum.workshop_category.'.$this->value;
     }
 }

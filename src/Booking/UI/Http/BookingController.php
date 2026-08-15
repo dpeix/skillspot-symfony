@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class BookingController extends AbstractController
 {
-    #[Route('/sessions/{id<\d+>}/reservation', name: 'booking_create', methods: ['POST'])]
+    #[Route(path: ['fr' => '/fr/sessions/{id<\d+>}/reservation', 'en' => '/en/sessions/{id<\d+>}/booking'], name: 'booking_create', methods: ['POST'])]
     public function create(int $id, Request $request, BookSessionHandler $book): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -32,16 +32,16 @@ final class BookingController extends AbstractController
         try {
             $booking = $book($id, $user);
             $this->addFlash('success', 'waitlisted' === $booking->getStatus()->value
-                ? 'La session est complète : vous êtes sur liste d’attente.'
-                : 'Votre place est confirmée.');
+                ? 'booking.flash.waitlisted'
+                : 'booking.flash.confirmed');
         } catch (BusinessRuleViolation $exception) {
-            $this->addFlash('error', $exception->getMessage());
+            $this->addFlash('error', ['key' => $exception->getTranslationKey(), 'parameters' => $exception->getParameters()]);
         }
 
         return $this->redirectToRoute('attendee_dashboard');
     }
 
-    #[Route('/dashboard', name: 'attendee_dashboard', methods: ['GET'])]
+    #[Route(path: ['fr' => '/fr/tableau-de-bord', 'en' => '/en/dashboard'], name: 'attendee_dashboard', methods: ['GET'])]
     public function dashboard(BookingRepositoryInterface $bookings): Response
     {
         $user = $this->getUser();
@@ -52,7 +52,7 @@ final class BookingController extends AbstractController
         return $this->render('booking/dashboard.html.twig', ['bookings' => $bookings->forUser($user)]);
     }
 
-    #[Route('/dashboard/reservations/{id<\d+>}/annulation', name: 'booking_cancel', methods: ['POST'])]
+    #[Route(path: ['fr' => '/fr/tableau-de-bord/reservations/{id<\d+>}/annulation', 'en' => '/en/dashboard/bookings/{id<\d+>}/cancel'], name: 'booking_cancel', methods: ['POST'])]
     public function cancel(int $id, Request $request, CancelBookingHandler $cancel): Response
     {
         if (!$this->isCsrfTokenValid('cancel-booking-'.$id, $request->request->getString('_token'))) {
@@ -66,9 +66,9 @@ final class BookingController extends AbstractController
 
         try {
             $cancel($id, $user);
-            $this->addFlash('success', 'Votre réservation est annulée.');
+            $this->addFlash('success', 'booking.flash.cancelled');
         } catch (BusinessRuleViolation $exception) {
-            $this->addFlash('error', $exception->getMessage());
+            $this->addFlash('error', ['key' => $exception->getTranslationKey(), 'parameters' => $exception->getParameters()]);
         }
 
         return $this->redirectToRoute('attendee_dashboard');

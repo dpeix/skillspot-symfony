@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Identity\Application\Data;
 
+use App\Shared\Domain\Enum\SupportedLocale;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class RegisterUserData
 {
+    public SupportedLocale $preferredLocale = SupportedLocale::French;
+
     #[Assert\NotBlank]
     #[Assert\Email]
     public string $email = '';
@@ -24,6 +27,6 @@ final class RegisterUserData
     #[Assert\Length(min: 10, max: 4096)]
     public string $plainPassword = '';
 
-    #[Assert\IsTrue(message: 'Vous devez accepter les conditions d’utilisation.')]
+    #[Assert\IsTrue(message: 'identity.validation.accept_terms')]
     public bool $agreeTerms = false;
 }

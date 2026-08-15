@@ -1,11 +1,17 @@
 <!doctype html>
-<html lang="fr">
+<html lang="{{ app.request.locale }}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="SkillSpot, des ateliers concrets animés par des passionnés.">
+        <meta name="description" content="{{ 'meta.description'|trans }}">
         <title>{% block title %}SkillSpot{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%234f46e5%22/><path d=%22M18 22h28M18 32h20M18 42h14%22 stroke=%22white%22 stroke-width=%226%22 stroke-linecap=%22round%22/></svg>">
+        {% if seo_localized|default(false) %}
+            <link rel="canonical" href="{{ localized_absolute_url(app.request.locale) }}">
+            <link rel="alternate" hreflang="fr" href="{{ localized_absolute_url('fr') }}">
+            <link rel="alternate" hreflang="en" href="{{ localized_absolute_url('en') }}">
+            <link rel="alternate" hreflang="x-default" href="{{ localized_absolute_url('fr') }}">
+        {% endif %}
         {% block stylesheets %}{% endblock %}
 
         {% block javascripts %}
@@ -20,34 +26,44 @@
         {% endif %}
     </head>
     <body>
-        <a class="skip-link" href="#main-content">Aller au contenu</a>
+        <a class="skip-link" href="#main-content">{{ 'navigation.skip'|trans }}</a>
         <header class="site-header">
             <div class="container nav-wrap">
-                <a href="{{ path('home') }}" class="brand" aria-label="Accueil SkillSpot"><span class="brand-mark">S</span>SkillSpot</a>
-                <nav aria-label="Navigation principale">
-                    <a href="{{ path('workshop_catalog') }}">Ateliers</a>
+                <a href="{{ path('home') }}" class="brand" aria-label="{{ 'navigation.home_aria'|trans }}"><span class="brand-mark">S</span>SkillSpot</a>
+                <nav aria-label="{{ 'navigation.main_aria'|trans }}">
+                    <a href="{{ path('workshop_catalog') }}">{{ 'navigation.workshops'|trans }}</a>
                     {% if app.user %}
-                        <a href="{{ path('attendee_dashboard') }}">Mes réservations</a>
-                        {% if is_granted('ROLE_ORGANIZER') %}<a href="{{ path('organizer_dashboard') }}">Espace organisateur</a>{% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}<a href="{{ path('admin') }}">Administration</a>{% endif %}
-                        <a href="{{ path('app_logout') }}" class="button button-ghost">Déconnexion</a>
+                        <a href="{{ path('attendee_dashboard') }}">{{ 'navigation.bookings'|trans }}</a>
+                        {% if is_granted('ROLE_ORGANIZER') %}<a href="{{ path('organizer_dashboard') }}">{{ 'navigation.organizer'|trans }}</a>{% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}<a href="{{ path('admin', {_locale: app.request.locale}) }}">{{ 'navigation.admin'|trans }}</a>{% endif %}
+                        <a href="{{ path('app_logout') }}" class="button button-ghost">{{ 'navigation.logout'|trans }}</a>
                     {% else %}
-                        <a href="{{ path('app_login') }}">Connexion</a>
-                        <a href="{{ path('register') }}" class="button button-small">Créer un compte</a>
+                        <a href="{{ path('app_login') }}">{{ 'navigation.login'|trans }}</a>
+                        <a href="{{ path('register') }}" class="button button-small">{{ 'navigation.register'|trans }}</a>
                     {% endif %}
+                    <div class="locale-switch" role="group" aria-label="{{ 'locale.switch_aria'|trans }}">
+                        {% for locale in ['fr', 'en'] %}
+                            <form method="post" action="{{ path('locale_switch', {locale: locale}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('switch_locale') }}">
+                                <input type="hidden" name="target" value="{{ localized_url(locale) }}">
+                                <button type="submit" lang="{{ locale }}" aria-label="{{ ('locale.switch_to.' ~ locale)|trans }}" {% if app.request.locale == locale %}aria-current="true"{% endif %}>{{ locale|upper }}</button>
+                            </form>
+                            {% if not loop.last %}<span aria-hidden="true">|</span>{% endif %}
+                        {% endfor %}
+                    </div>
                 </nav>
             </div>
         </header>
         <main id="main-content">
             <div class="container flashes" aria-live="polite">
                 {% for type, messages in app.flashes %}
-                    {% for message in messages %}<div class="flash flash-{{ type }}">{{ message }}</div>{% endfor %}
+                    {% for message in messages %}<div class="flash flash-{{ type }}">{{ message is iterable ? message.key|trans(message.parameters) : message|trans }}</div>{% endfor %}
                 {% endfor %}
             </div>
             {% block body %}{% endblock %}
         </main>
         <footer class="site-footer">
-            <div class="container footer-wrap"><span>© {{ 'now'|date('Y') }} SkillSpot</span><span>Construit avec Symfony, PostgreSQL et FrankenPHP.</span></div>
+            <div class="container footer-wrap"><span>© {{ 'now'|date('Y') }} SkillSpot</span><span>{{ 'footer.stack'|trans }}</span></div>
         </footer>
     </body>
 </html>

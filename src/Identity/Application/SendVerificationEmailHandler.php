@@ -23,17 +23,19 @@ final readonly class SendVerificationEmailHandler
             'verify_email',
             (string) $user->getId(),
             $user->getEmail(),
-            ['id' => $user->getId()],
+            ['id' => $user->getId(), '_locale' => $user->getPreferredLocale()->value],
         );
 
         $this->bus->dispatch(new SendTransactionalEmail(
             $user->getEmail(),
             $user->getDisplayName(),
-            'Confirmez votre adresse e-mail',
-            'Bienvenue sur SkillSpot',
-            'Confirmez votre adresse pour accéder aux réservations et aux espaces membres.',
+            $user->getPreferredLocale()->value,
+            'email.verification.subject',
+            'email.verification.heading',
+            'email.verification.body',
+            [],
             $signature->getSignedUrl(),
-            'Confirmer mon adresse',
+            'email.verification.action',
         ));
     }
 }

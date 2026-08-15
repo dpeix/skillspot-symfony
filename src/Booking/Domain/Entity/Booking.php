@@ -94,7 +94,7 @@ class Booking
     public function reactivate(BookingStatus $status, \DateTimeImmutable $now): void
     {
         if (BookingStatus::Cancelled !== $this->status) {
-            throw new BusinessRuleViolation('Cette réservation est déjà active.');
+            throw new BusinessRuleViolation('booking.error.already_active');
         }
 
         $this->status = $status;
@@ -106,7 +106,7 @@ class Booking
     public function cancelByAttendee(\DateTimeImmutable $now): void
     {
         if (!$this->session->canBeCancelledByAttendeeAt($now)) {
-            throw new BusinessRuleViolation('Une réservation ne peut plus être annulée moins de 24 h avant la session.');
+            throw new BusinessRuleViolation('booking.error.cancellation_deadline');
         }
 
         $this->cancel($now);
@@ -115,7 +115,7 @@ class Booking
     public function cancel(\DateTimeImmutable $now): void
     {
         if (BookingStatus::Cancelled === $this->status) {
-            throw new BusinessRuleViolation('Cette réservation est déjà annulée.');
+            throw new BusinessRuleViolation('booking.error.already_cancelled');
         }
 
         $this->status = BookingStatus::Cancelled;
@@ -126,7 +126,7 @@ class Booking
     public function promote(\DateTimeImmutable $now): void
     {
         if (BookingStatus::Waitlisted !== $this->status) {
-            throw new BusinessRuleViolation('Seule une réservation en attente peut être promue.');
+            throw new BusinessRuleViolation('booking.error.only_waitlisted_promotion');
         }
 
         $this->status = BookingStatus::Confirmed;
@@ -136,11 +136,11 @@ class Booking
     public function markAttendance(AttendanceStatus $attendance, \DateTimeImmutable $now): void
     {
         if (BookingStatus::Confirmed !== $this->status || SessionStatus::Completed !== $this->session->getStatus()) {
-            throw new BusinessRuleViolation('La présence ne peut être enregistrée qu’après une session terminée.');
+            throw new BusinessRuleViolation('booking.error.attendance_after_completion');
         }
 
         if (AttendanceStatus::Pending === $attendance) {
-            throw new BusinessRuleViolation('La présence doit être confirmée ou marquée absente.');
+            throw new BusinessRuleViolation('booking.error.invalid_attendance');
         }
 
         $this->attendance = $attendance;

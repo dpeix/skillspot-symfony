@@ -12,11 +12,19 @@ final class WorkshopData
 {
     #[Assert\NotBlank]
     #[Assert\Length(min: 5, max: 160)]
-    public string $title = '';
+    public string $titleFr = '';
 
     #[Assert\NotBlank]
     #[Assert\Length(min: 80, max: 5000)]
-    public string $description = '';
+    public string $descriptionFr = '';
+
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 5, max: 160)]
+    public string $titleEn = '';
+
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 80, max: 5000)]
+    public string $descriptionEn = '';
 
     #[Assert\NotNull]
     public WorkshopCategory $category = WorkshopCategory::Development;

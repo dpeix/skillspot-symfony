@@ -39,6 +39,10 @@ a:hover { color: var(--primary-dark); }
 .brand-mark { display: grid; place-items: center; width: 36px; aspect-ratio: 1; border-radius: 11px; color: #fff; background: var(--primary); }
 nav { display: flex; align-items: center; gap: 1.35rem; }
 nav > a:not(.button) { color: var(--ink); font-weight: 600; font-size: .94rem; }
+.locale-switch { display: inline-flex; align-items: center; gap: .3rem; color: var(--muted); }
+.locale-switch form { display: inline; margin: 0; }
+.locale-switch button { border: 0; padding: .2rem; color: var(--muted); background: transparent; font: 700 .8rem 'DM Sans', sans-serif; cursor: pointer; }
+.locale-switch button[aria-current="true"] { color: var(--primary); text-decoration: underline; text-underline-offset: .2rem; }
 .button { display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 12px; padding: .85rem 1.25rem; background: var(--primary); color: #fff; font: 700 .95rem 'DM Sans', sans-serif; cursor: pointer; transition: .2s ease; }
 .button:hover { color: #fff; background: var(--primary-dark); transform: translateY(-1px); }
 .button-secondary { background: #ece9ff; color: var(--primary-dark); }
@@ -106,6 +110,8 @@ textarea.form-control { min-height: 120px; resize: vertical; }
 .form-control[type="checkbox"] { width: auto; min-height: auto; padding: 0; }
 .form-row ul { margin: .4rem 0 0; padding: 0; list-style: none; color: var(--danger); font-size: .88rem; }
 .form-row .help-text { color: var(--muted); font-size: .86rem; }
+.auth-card fieldset { margin: 0 0 1.5rem; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; }
+.auth-card legend { padding: 0 .4rem; font-weight: 800; }
 .form-actions { display: flex; align-items: center; gap: .8rem; margin-top: 1.5rem; }
 
 .dashboard-header { padding: 4rem 0 2rem; }

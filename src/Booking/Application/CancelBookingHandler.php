@@ -33,7 +33,7 @@ final readonly class CancelBookingHandler
         $result = $this->transactions->run(function () use ($bookingId, $attendee, $now): array {
             $booking = $this->bookings->get($bookingId);
             if (!$booking instanceof Booking || $booking->getAttendee() !== $attendee) {
-                throw new BusinessRuleViolation('Cette réservation est introuvable.');
+                throw new BusinessRuleViolation('booking.error.not_found');
             }
 
             $session = $this->sessions->lock((int) $booking->getSession()->getId());

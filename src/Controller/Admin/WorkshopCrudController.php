@@ -10,10 +10,18 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @extends AbstractCrudController<Workshop> */
 final class WorkshopCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly RequestStack $requests,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return Workshop::class;
@@ -29,10 +37,10 @@ final class WorkshopCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id');
-        yield TextField::new('title', 'Titre');
-        yield TextField::new('owner.displayName', 'Organisateur');
-        yield TextField::new('category')->formatValue(static fn (mixed $value, Workshop $workshop): string => $workshop->getCategory()->label());
-        yield TextField::new('level', 'Niveau')->formatValue(static fn (mixed $value, Workshop $workshop): string => $workshop->getLevel()->label());
-        yield TextField::new('status', 'Statut')->formatValue(static fn (mixed $value, Workshop $workshop): string => $workshop->getStatus()->value);
+        yield TextField::new('title', 'workshop.form.title')->formatValue(fn (mixed $value, Workshop $workshop): string => $workshop->translation($this->requests->getCurrentRequest()?->getLocale() ?? 'fr')->getTitle());
+        yield TextField::new('owner.displayName', 'admin.workshop.organizer');
+        yield TextField::new('category', 'workshop.form.category')->formatValue(fn (mixed $value, Workshop $workshop): string => $this->translator->trans($workshop->getCategory()->labelKey()));
+        yield TextField::new('level', 'workshop.form.level')->formatValue(fn (mixed $value, Workshop $workshop): string => $this->translator->trans($workshop->getLevel()->labelKey()));
+        yield TextField::new('status', 'admin.workshop.status')->formatValue(fn (mixed $value, Workshop $workshop): string => $this->translator->trans($workshop->getStatus()->labelKey()));
     }
 }

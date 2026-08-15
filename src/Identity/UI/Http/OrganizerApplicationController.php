@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class OrganizerApplicationController extends AbstractController
 {
-    #[Route('/organizer/apply', name: 'organizer_apply', methods: ['GET', 'POST'])]
+    #[Route(path: ['fr' => '/fr/organisateur/devenir-organisateur', 'en' => '/en/organizer/apply'], name: 'organizer_apply', methods: ['GET', 'POST'])]
     public function __invoke(Request $request, ApplyForOrganizerHandler $apply): Response
     {
         if ($this->isGranted('ROLE_ORGANIZER')) {
@@ -33,11 +33,11 @@ final class OrganizerApplicationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $apply($user, $data);
-                $this->addFlash('success', 'Votre demande a été transmise à l’équipe SkillSpot.');
+                $this->addFlash('success', 'organizer.application.flash.sent');
 
                 return $this->redirectToRoute('attendee_dashboard');
             } catch (BusinessRuleViolation $exception) {
-                $this->addFlash('error', $exception->getMessage());
+                $this->addFlash('error', ['key' => $exception->getTranslationKey(), 'parameters' => $exception->getParameters()]);
             }
         }
 

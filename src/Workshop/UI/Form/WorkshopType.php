@@ -19,18 +19,20 @@ final class WorkshopType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title', null, ['label' => 'Titre'])
-            ->add('description', TextareaType::class, ['label' => 'Description', 'attr' => ['rows' => 10]])
+            ->add('titleFr', null, ['label' => 'workshop.form.title'])
+            ->add('descriptionFr', TextareaType::class, ['label' => 'workshop.form.description', 'attr' => ['rows' => 8]])
+            ->add('titleEn', null, ['label' => 'workshop.form.title'])
+            ->add('descriptionEn', TextareaType::class, ['label' => 'workshop.form.description', 'attr' => ['rows' => 8]])
             ->add('category', ChoiceType::class, [
-                'label' => 'Catégorie',
+                'label' => 'workshop.form.category',
                 'choices' => WorkshopCategory::cases(),
-                'choice_label' => static fn (WorkshopCategory $category): string => $category->label(),
+                'choice_label' => static fn (WorkshopCategory $category): string => $category->labelKey(),
                 'choice_value' => static fn (WorkshopCategory $category): string => $category->value,
             ])
             ->add('level', ChoiceType::class, [
-                'label' => 'Niveau',
+                'label' => 'workshop.form.level',
                 'choices' => WorkshopLevel::cases(),
-                'choice_label' => static fn (WorkshopLevel $level): string => $level->label(),
+                'choice_label' => static fn (WorkshopLevel $level): string => $level->labelKey(),
                 'choice_value' => static fn (WorkshopLevel $level): string => $level->value,
             ]);
     }

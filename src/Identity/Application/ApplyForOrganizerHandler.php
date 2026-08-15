@@ -19,7 +19,7 @@ final readonly class ApplyForOrganizerHandler
     public function __invoke(User $user, OrganizerApplicationData $data): OrganizerApplication
     {
         if ($this->applications->hasPendingFor($user)) {
-            throw new BusinessRuleViolation('Vous avez déjà une demande en cours.');
+            throw new BusinessRuleViolation('organizer.application.error.already_pending');
         }
 
         $application = new OrganizerApplication($user, $data->motivation);

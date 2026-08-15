@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Workshop\Domain\Repository\WorkshopRepositoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -24,7 +25,10 @@ final readonly class WorkshopResourceProvider implements ProviderInterface
     {
         if (!$operation instanceof GetCollection) {
             $identifier = $uriVariables['slug'] ?? '';
-            $workshop = $this->workshops->findPublishedBySlug(\is_string($identifier) ? $identifier : '');
+            $workshop = $this->workshops->findPublishedBySlug(
+                SupportedLocale::French,
+                \is_string($identifier) ? $identifier : '',
+            );
 
             return $workshop ? $this->resources->workshop($workshop) : null;
         }

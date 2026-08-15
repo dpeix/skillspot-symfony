@@ -40,10 +40,10 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/organizer/apply, roles: ROLE_USER }
-        - { path: ^/organizer, roles: ROLE_ORGANIZER }
-        - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/(?:fr|en)/admin, roles: ROLE_ADMIN }
+        - { path: ^/fr/organisateur/devenir-organisateur|^/en/organizer/apply, roles: ROLE_USER }
+        - { path: ^/fr/organisateur|^/en/organizer, roles: ROLE_ORGANIZER }
+        - { path: ^/fr/tableau-de-bord|^/en/dashboard, roles: ROLE_USER }
 
 when@test:
     security:

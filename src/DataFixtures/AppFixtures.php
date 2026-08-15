@@ -10,6 +10,7 @@ use App\Booking\Domain\Enum\BookingStatus;
 use App\Identity\Domain\Entity\OrganizerApplication;
 use App\Identity\Domain\Entity\User;
 use App\Identity\Domain\Enum\Role;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Workshop\Domain\Entity\Workshop;
 use App\Workshop\Domain\Entity\WorkshopSession;
 use App\Workshop\Domain\Enum\WorkshopCategory;
@@ -29,12 +30,12 @@ final class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $admin = $this->user('admin@skillspot.local', 'Alice', 'Admin', Role::Admin);
+        $admin = $this->user('admin@skillspot.local', 'Alice', 'Admin', Role::Admin, SupportedLocale::English);
         $organizer = $this->user('organizer@skillspot.local', 'Sofia', 'Martin', Role::Organizer);
         $participant = $this->user('participant@skillspot.local', 'Thomas', 'Bernard');
         $secondParticipant = $this->user('lea@skillspot.local', 'Léa', 'Robert');
         $thirdParticipant = $this->user('karim@skillspot.local', 'Karim', 'Petit');
-        $candidate = $this->user('candidate@skillspot.local', 'Camille', 'Durand');
+        $candidate = $this->user('candidate@skillspot.local', 'Camille', 'Durand', locale: SupportedLocale::English);
         foreach ([$admin, $organizer, $participant, $secondParticipant, $thirdParticipant, $candidate] as $user) {
             $manager->persist($user);
         }
@@ -45,10 +46,10 @@ final class AppFixtures extends Fixture
         ));
 
         $workshops = [
-            $this->workshop($organizer, 'Symfony sans magie noire', 'symfony-sans-magie-noire', 'Comprenez réellement le conteneur de services, le cycle HTTP et les événements Symfony. Nous construirons une fonctionnalité complète en privilégiant des objets explicites, des tests utiles et des décisions architecturales faciles à expliquer.', WorkshopCategory::Development, WorkshopLevel::Intermediate),
-            $this->workshop($organizer, 'Concevoir un design system utile', 'concevoir-un-design-system-utile', 'Passez des composants isolés à un langage visuel partagé. Cet atelier couvre les tokens, les variantes, la documentation et les règles de contribution au travers d’exercices collaboratifs directement applicables en équipe.', WorkshopCategory::Design, WorkshopLevel::Beginner),
-            $this->workshop($organizer, 'SQL pour analyser un produit', 'sql-pour-analyser-un-produit', 'Explorez un jeu de données produit réaliste avec PostgreSQL. Segmentation, rétention et cohortes seront abordées progressivement, avec un soin particulier porté à la lisibilité et à la performance des requêtes.', WorkshopCategory::Data, WorkshopLevel::Intermediate),
-            $this->workshop($organizer, 'Préparer un entretien technique', 'preparer-un-entretien-technique', 'Transformez votre expérience en récits techniques structurés. Nous travaillerons la présentation d’un projet, les compromis d’architecture et une méthode concrète pour répondre aux exercices de conception sans réciter un cours.', WorkshopCategory::Career, WorkshopLevel::Beginner),
+            $this->workshop($organizer, 'Symfony sans magie noire', 'symfony-sans-magie-noire', 'Comprenez réellement le conteneur de services, le cycle HTTP et les événements Symfony. Nous construirons une fonctionnalité complète en privilégiant des objets explicites, des tests utiles et des décisions architecturales faciles à expliquer.', 'Symfony without black magic', 'symfony-without-black-magic', 'Understand the service container, the HTTP lifecycle and Symfony events for real. We will build a complete feature using explicit objects, useful tests and architectural decisions that are easy to explain.', WorkshopCategory::Development, WorkshopLevel::Intermediate),
+            $this->workshop($organizer, 'Concevoir un design system utile', 'concevoir-un-design-system-utile', 'Passez des composants isolés à un langage visuel partagé. Cet atelier couvre les tokens, les variantes, la documentation et les règles de contribution au travers d’exercices collaboratifs directement applicables en équipe.', 'Build a useful design system', 'build-a-useful-design-system', 'Move from isolated components to a shared visual language. This workshop covers tokens, variants, documentation and contribution rules through collaborative exercises your team can apply immediately.', WorkshopCategory::Design, WorkshopLevel::Beginner),
+            $this->workshop($organizer, 'SQL pour analyser un produit', 'sql-pour-analyser-un-produit', 'Explorez un jeu de données produit réaliste avec PostgreSQL. Segmentation, rétention et cohortes seront abordées progressivement, avec un soin particulier porté à la lisibilité et à la performance des requêtes.', 'SQL for product analytics', 'sql-for-product-analytics', 'Explore a realistic product dataset with PostgreSQL. Segmentation, retention and cohorts are introduced progressively, with particular attention paid to readable and efficient queries.', WorkshopCategory::Data, WorkshopLevel::Intermediate),
+            $this->workshop($organizer, 'Préparer un entretien technique', 'preparer-un-entretien-technique', 'Transformez votre expérience en récits techniques structurés. Nous travaillerons la présentation d’un projet, les compromis d’architecture et une méthode concrète pour répondre aux exercices de conception sans réciter un cours.', 'Prepare for a technical interview', 'prepare-for-a-technical-interview', 'Turn your experience into structured technical stories. We will practise presenting a project, discussing architectural trade-offs and answering system-design exercises without reciting a textbook.', WorkshopCategory::Career, WorkshopLevel::Beginner),
         ];
         foreach ($workshops as $workshop) {
             $manager->persist($workshop);
@@ -77,9 +78,14 @@ final class AppFixtures extends Fixture
         $manager->flush();
     }
 
-    private function user(string $email, string $firstName, string $lastName, ?Role $role = null): User
-    {
-        $user = new User($email, $firstName, $lastName);
+    private function user(
+        string $email,
+        string $firstName,
+        string $lastName,
+        ?Role $role = null,
+        SupportedLocale $locale = SupportedLocale::French,
+    ): User {
+        $user = new User($email, $firstName, $lastName, preferredLocale: $locale);
         $user->changePassword($this->passwordHasher->hashPassword($user, self::DEMO_PASSWORD));
         $user->verify();
         if ($role) {
@@ -89,9 +95,20 @@ final class AppFixtures extends Fixture
         return $user;
     }
 
-    private function workshop(User $owner, string $title, string $slug, string $description, WorkshopCategory $category, WorkshopLevel $level): Workshop
-    {
-        $workshop = new Workshop($owner, $title, $slug, $description, $category, $level);
+    private function workshop(
+        User $owner,
+        string $titleFr,
+        string $slugFr,
+        string $descriptionFr,
+        string $titleEn,
+        string $slugEn,
+        string $descriptionEn,
+        WorkshopCategory $category,
+        WorkshopLevel $level,
+    ): Workshop {
+        $workshop = new Workshop($owner, $category, $level);
+        $workshop->addTranslation(SupportedLocale::French, $titleFr, $slugFr, $descriptionFr);
+        $workshop->addTranslation(SupportedLocale::English, $titleEn, $slugEn, $descriptionEn);
         $workshop->setWorkflowState('published');
 
         return $workshop;

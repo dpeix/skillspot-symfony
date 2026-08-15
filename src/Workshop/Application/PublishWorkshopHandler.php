@@ -21,8 +21,12 @@ final readonly class PublishWorkshopHandler
 
     public function __invoke(Workshop $workshop): void
     {
+        if (!$workshop->hasAllTranslations()) {
+            throw new BusinessRuleViolation('workshop.error.translations_required');
+        }
+
         if (!$workshop->hasFutureSession($this->clock->now())) {
-            throw new BusinessRuleViolation('Ajoutez au moins une session future avant de publier.');
+            throw new BusinessRuleViolation('workshop.error.future_session_required');
         }
 
         $this->workflows->get($workshop, 'workshop')->apply($workshop, 'publish');

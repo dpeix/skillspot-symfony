@@ -10,12 +10,8 @@ enum WorkshopLevel: string
     case Intermediate = 'intermediate';
     case Advanced = 'advanced';
 
-    public function label(): string
+    public function labelKey(): string
     {
-        return match ($this) {
-            self::Beginner => 'Débutant',
-            self::Intermediate => 'Intermédiaire',
-            self::Advanced => 'Avancé',
-        };
+        return 'enum.workshop_level.'.$this->value;
     }
 }

@@ -48,7 +48,8 @@ jobs:
           composer validate --strict
           composer lint
           php bin/console doctrine:schema:validate --env=test
-          php bin/console asset-map:compile
+          php bin/console doctrine:migrations:up-to-date --env=test
+          php bin/console asset-map:compile --env=prod
       - name: Check code style
         run: composer cs-check
       - name: Static analysis

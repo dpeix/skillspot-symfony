@@ -10,12 +10,8 @@ enum BookingStatus: string
     case Waitlisted = 'waitlisted';
     case Cancelled = 'cancelled';
 
-    public function label(): string
+    public function labelKey(): string
     {
-        return match ($this) {
-            self::Confirmed => 'Confirmée',
-            self::Waitlisted => 'Liste d’attente',
-            self::Cancelled => 'Annulée',
-        };
+        return 'enum.booking_status.'.$this->value;
     }
 }

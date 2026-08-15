@@ -29,7 +29,7 @@ final class WorkshopSessionRepository extends ServiceEntityRepository implements
     {
         $session = $this->getEntityManager()->find(WorkshopSession::class, $id, LockMode::PESSIMISTIC_WRITE);
         if (!$session instanceof WorkshopSession) {
-            throw new BusinessRuleViolation('Cette session est introuvable.');
+            throw new BusinessRuleViolation('session.error.not_found');
         }
 
         return $session;

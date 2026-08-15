@@ -19,7 +19,7 @@ final readonly class AddSessionHandler
     public function __invoke(Workshop $workshop, SessionData $data): WorkshopSession
     {
         if (!$data->startsAt || !$data->endsAt) {
-            throw new BusinessRuleViolation('Les horaires de la session sont obligatoires.');
+            throw new BusinessRuleViolation('session.error.schedule_required');
         }
 
         $session = new WorkshopSession(

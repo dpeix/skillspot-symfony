@@ -164,7 +164,7 @@ class WorkshopSession
     public function cancel(): void
     {
         if (SessionStatus::Scheduled !== $this->status) {
-            throw new BusinessRuleViolation('Seule une session planifiée peut être annulée.');
+            throw new BusinessRuleViolation('session.error.only_scheduled_cancellation');
         }
 
         $this->status = SessionStatus::Cancelled;
@@ -173,7 +173,7 @@ class WorkshopSession
     public function complete(\DateTimeImmutable $now): void
     {
         if (SessionStatus::Scheduled !== $this->status || $now < $this->endsAt) {
-            throw new BusinessRuleViolation('La session ne peut pas encore être terminée.');
+            throw new BusinessRuleViolation('session.error.cannot_complete');
         }
 
         $this->status = SessionStatus::Completed;
@@ -188,15 +188,15 @@ class WorkshopSession
         ?string $meetingUrl,
     ): void {
         if ($endsAt <= $startsAt || $capacity < 1 || $capacity > 200) {
-            throw new BusinessRuleViolation('Les horaires ou la capacité de la session sont invalides.');
+            throw new BusinessRuleViolation('session.error.invalid_schedule');
         }
 
         if (WorkshopMode::Onsite === $mode && !$location) {
-            throw new BusinessRuleViolation('Une adresse est obligatoire pour une session sur place.');
+            throw new BusinessRuleViolation('session.error.location_required');
         }
 
         if (WorkshopMode::Online === $mode && (!filter_var($meetingUrl, \FILTER_VALIDATE_URL))) {
-            throw new BusinessRuleViolation('Un lien valide est obligatoire pour une session en visioconférence.');
+            throw new BusinessRuleViolation('session.error.meeting_url_required');
         }
     }
 }

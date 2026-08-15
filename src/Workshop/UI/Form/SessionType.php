@@ -21,17 +21,17 @@ final class SessionType extends AbstractType
     {
         $dateOptions = ['widget' => 'single_text', 'input' => 'datetime_immutable', 'model_timezone' => 'UTC', 'view_timezone' => 'Europe/Paris'];
         $builder
-            ->add('startsAt', DateTimeType::class, $dateOptions + ['label' => 'Début'])
-            ->add('endsAt', DateTimeType::class, $dateOptions + ['label' => 'Fin'])
-            ->add('capacity', IntegerType::class, ['label' => 'Nombre de places'])
+            ->add('startsAt', DateTimeType::class, $dateOptions + ['label' => 'session.form.starts_at'])
+            ->add('endsAt', DateTimeType::class, $dateOptions + ['label' => 'session.form.ends_at'])
+            ->add('capacity', IntegerType::class, ['label' => 'session.form.capacity'])
             ->add('mode', ChoiceType::class, [
-                'label' => 'Modalité',
+                'label' => 'session.form.mode',
                 'choices' => WorkshopMode::cases(),
-                'choice_label' => static fn (WorkshopMode $mode): string => $mode->label(),
+                'choice_label' => static fn (WorkshopMode $mode): string => $mode->labelKey(),
                 'choice_value' => static fn (WorkshopMode $mode): string => $mode->value,
             ])
-            ->add('location', null, ['label' => 'Adresse (sur place)', 'required' => false])
-            ->add('meetingUrl', UrlType::class, ['label' => 'Lien de visioconférence', 'required' => false]);
+            ->add('location', null, ['label' => 'session.form.location', 'required' => false])
+            ->add('meetingUrl', UrlType::class, ['label' => 'session.form.meeting_url', 'required' => false]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

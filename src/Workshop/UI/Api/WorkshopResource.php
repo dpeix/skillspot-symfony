@@ -29,12 +29,16 @@ use ApiPlatform\Metadata\QueryParameter;
 )]
 final readonly class WorkshopResource
 {
-    /** @param list<SessionResource> $sessions */
+    /**
+     * @param array{fr: array{slug: string, title: string, description: string}, en: array{slug: string, title: string, description: string}} $translations
+     * @param list<SessionResource>                                                                                                           $sessions
+     */
     public function __construct(
         #[ApiProperty(identifier: true)]
         public string $slug,
         public string $title,
         public string $description,
+        public array $translations,
         public string $category,
         public string $level,
         public string $organizer,

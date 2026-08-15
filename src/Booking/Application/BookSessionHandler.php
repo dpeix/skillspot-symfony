@@ -33,15 +33,15 @@ final readonly class BookSessionHandler
         $booking = $this->transactions->run(function () use ($sessionId, $attendee, $now): Booking {
             $session = $this->sessions->lock($sessionId);
             if (!$session->isBookableAt($now)) {
-                throw new BusinessRuleViolation('Cette session n’est plus réservable.');
+                throw new BusinessRuleViolation('booking.error.session_unbookable');
             }
 
             $existing = $this->bookings->findFor($attendee, $session);
             if ($existing && BookingStatus::Cancelled !== $existing->getStatus()) {
-                throw new BusinessRuleViolation('Vous avez déjà réservé cette session.');
+                throw new BusinessRuleViolation('booking.error.duplicate');
             }
             if ($this->bookings->hasActiveOverlap($attendee, $session)) {
-                throw new BusinessRuleViolation('Cette session chevauche une autre de vos réservations.');
+                throw new BusinessRuleViolation('booking.error.overlap');
             }
 
             $status = $this->bookings->countConfirmed($session) < $session->getCapacity()

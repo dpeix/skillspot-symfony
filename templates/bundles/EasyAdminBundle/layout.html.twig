@@ -1,0 +1,15 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block header_custom_menu %}
+    <div role="group" aria-label="{{ 'locale.switch_aria'|trans }}" style="display:flex;align-items:center;gap:.35rem;margin-right:1rem">
+        {% for locale in ['fr', 'en'] %}
+            <form method="post" action="{{ path('locale_switch', {locale: locale}) }}" style="display:inline;margin:0">
+                <input type="hidden" name="_token" value="{{ csrf_token('switch_locale') }}">
+                <input type="hidden" name="target" value="{{ localized_url(locale) }}">
+                <button type="submit" lang="{{ locale }}" aria-label="{{ ('locale.switch_to.' ~ locale)|trans }}" {% if app.request.locale == locale %}aria-current="true"{% endif %} style="border:0;background:transparent;font-weight:700;{{ app.request.locale == locale ? 'text-decoration:underline' : '' }}">{{ locale|upper }}</button>
+            </form>
+            {% if not loop.last %}<span aria-hidden="true">|</span>{% endif %}
+        {% endfor %}
+    </div>
+    {{ parent() }}
+{% endblock %}

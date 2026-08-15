@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Workshop\Application;
 
 use App\Identity\Domain\Entity\User;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Workshop\Application\Data\WorkshopData;
 use App\Workshop\Domain\Entity\Workshop;
 use App\Workshop\Domain\Repository\WorkshopRepositoryInterface;
@@ -20,17 +21,32 @@ final readonly class CreateWorkshopHandler
 
     public function __invoke(User $owner, WorkshopData $data): Workshop
     {
-        $baseSlug = $this->slugger->slug($data->title)->lower()->toString();
         $workshop = new Workshop(
             $owner,
-            $data->title,
-            $this->workshops->nextAvailableSlug($baseSlug),
-            $data->description,
             $data->category,
             $data->level,
+        );
+        $workshop->addTranslation(
+            SupportedLocale::French,
+            $data->titleFr,
+            $this->slug(SupportedLocale::French, $data->titleFr),
+            $data->descriptionFr,
+        );
+        $workshop->addTranslation(
+            SupportedLocale::English,
+            $data->titleEn,
+            $this->slug(SupportedLocale::English, $data->titleEn),
+            $data->descriptionEn,
         );
         $this->workshops->save($workshop);
 
         return $workshop;
+    }
+
+    private function slug(SupportedLocale $locale, string $title): string
+    {
+        $baseSlug = $this->slugger->slug($title)->lower()->toString();
+
+        return $this->workshops->nextAvailableSlug($locale, $baseSlug);
     }
 }

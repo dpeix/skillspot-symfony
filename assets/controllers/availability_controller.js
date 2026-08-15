@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static values = { url: String };
+    static values = { url: String, availableLabel: String, waitlistLabel: String };
     static targets = ['count', 'label'];
 
     connect() {
@@ -10,7 +10,7 @@ export default class extends Controller {
         this.source.onmessage = (event) => {
             const availability = JSON.parse(event.data);
             this.countTarget.textContent = availability.remainingSeats;
-            this.labelTarget.textContent = availability.remainingSeats > 0 ? 'places disponibles' : 'liste d’attente';
+            this.labelTarget.textContent = availability.remainingSeats > 0 ? this.availableLabelValue : this.waitlistLabelValue;
             this.element.classList.toggle('is-full', availability.remainingSeats === 0);
         };
     }

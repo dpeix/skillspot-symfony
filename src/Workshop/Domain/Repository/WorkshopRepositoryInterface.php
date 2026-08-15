@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Workshop\Domain\Repository;
 
 use App\Identity\Domain\Entity\User;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Workshop\Domain\Entity\Workshop;
 
 interface WorkshopRepositoryInterface
@@ -21,9 +22,11 @@ interface WorkshopRepositoryInterface
     /** @return list<Workshop> */
     public function ownedBy(User $owner): array;
 
-    public function findPublishedBySlug(string $slug): ?Workshop;
+    public function findPublishedBySlug(SupportedLocale $locale, string $slug): ?Workshop;
+
+    public function findPublishedByAnySlug(string $slug): ?Workshop;
 
     public function save(Workshop $workshop): void;
 
-    public function nextAvailableSlug(string $baseSlug): string;
+    public function nextAvailableSlug(SupportedLocale $locale, string $baseSlug): string;
 }

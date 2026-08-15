@@ -16,8 +16,8 @@ final class OrganizerApplicationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('motivation', TextareaType::class, [
-            'label' => 'Votre projet d’atelier',
-            'help' => 'Présentez votre expérience, les sujets que vous souhaitez transmettre et votre public.',
+            'label' => 'organizer.application.form.motivation',
+            'help' => 'organizer.application.form.motivation_help',
             'attr' => ['rows' => 8],
         ]);
     }

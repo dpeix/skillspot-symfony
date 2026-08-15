@@ -1,42 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SkillSpot — Apprenez, partagez, rencontrez{% endblock %}
+{% block title %}{{ 'home.title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="hero">
     <div class="container hero-grid">
         <div>
-            <p class="eyebrow">Des savoirs qui circulent</p>
-            <h1>Apprenez quelque chose de <span>concret.</span></h1>
-            <p class="hero-copy">Découvrez des ateliers en petit groupe, animés par des professionnels passionnés. Réservez en quelques secondes, sur place ou à distance.</p>
+            <p class="eyebrow">{{ 'home.eyebrow'|trans }}</p>
+            <h1>{{ 'home.heading'|trans|replace({'<accent>': '<span>', '</accent>': '</span>'})|raw }}</h1>
+            <p class="hero-copy">{{ 'home.intro'|trans }}</p>
             <div class="hero-actions">
-                <a class="button" href="{{ path('workshop_catalog') }}">Explorer les ateliers</a>
-                {% if not app.user %}<a class="button button-secondary" href="{{ path('register') }}">Rejoindre SkillSpot</a>{% endif %}
+                <a class="button" href="{{ path('workshop_catalog') }}">{{ 'home.explore'|trans }}</a>
+                {% if not app.user %}<a class="button button-secondary" href="{{ path('register') }}">{{ 'home.join'|trans }}</a>{% endif %}
             </div>
         </div>
         <div class="hero-panel" aria-hidden="true">
-            <div class="floating-card"><div class="mini-icon">⌘</div><h3>Symfony sans magie noire</h3><p class="muted">Développement · Intermédiaire</p></div>
-            <div class="floating-card"><div class="mini-icon">✦</div><h3>Design critique en équipe</h3><p class="muted">Design · Débutant</p></div>
-            <div class="floating-card"><strong>94%</strong><p class="muted">de participants présents</p></div>
+            <div class="floating-card"><div class="mini-icon">⌘</div><h3>{{ 'home.featured_one'|trans }}</h3><p class="muted">{{ 'enum.workshop_category.development'|trans }} · {{ 'enum.workshop_level.intermediate'|trans }}</p></div>
+            <div class="floating-card"><div class="mini-icon">✦</div><h3>{{ 'home.featured_two'|trans }}</h3><p class="muted">{{ 'enum.workshop_category.design'|trans }} · {{ 'enum.workshop_level.beginner'|trans }}</p></div>
+            <div class="floating-card"><strong>{{ 0.94|format_percent_number }}</strong><p class="muted">{{ 'home.attendance_rate'|trans }}</p></div>
         </div>
     </div>
 </section>
 
 <section class="section">
     <div class="container">
-        <div class="section-heading"><div><p class="eyebrow">Prochainement</p><h2>Ateliers à découvrir</h2></div><a href="{{ path('workshop_catalog') }}">Voir tout →</a></div>
+        <div class="section-heading"><div><p class="eyebrow">{{ 'home.upcoming'|trans }}</p><h2>{{ 'home.discover'|trans }}</h2></div><a href="{{ path('workshop_catalog') }}">{{ 'home.see_all'|trans }}</a></div>
         {% if workshops %}
             <div class="workshop-grid">{% for workshop in workshops %}<twig:WorkshopCard :workshop="workshop" />{% endfor %}</div>
         {% else %}
-            <div class="empty-state"><h3>La programmation arrive</h3><p>Chargez les fixtures de démonstration pour découvrir SkillSpot.</p></div>
+            <div class="empty-state"><h3>{{ 'home.empty_title'|trans }}</h3><p>{{ 'home.empty_text'|trans }}</p></div>
         {% endif %}
     </div>
 </section>
 
 <section class="section section-soft">
     <div class="container detail-grid">
-        <div><p class="eyebrow">Partagez votre expertise</p><h2>Vous avez quelque chose à transmettre ?</h2><p class="hero-copy">Proposez votre projet. Notre équipe valide votre profil, puis vous gardez la main sur vos ateliers, vos sessions et vos participants.</p></div>
-        <div class="panel"><h3>Un espace organisateur complet</h3><p class="muted">Planning, capacité, liste d’attente automatique, émargement et statistiques.</p><a class="button" href="{{ app.user ? path('organizer_apply') : path('register') }}">Devenir organisateur</a></div>
+        <div><p class="eyebrow">{{ 'home.share_eyebrow'|trans }}</p><h2>{{ 'home.share_title'|trans }}</h2><p class="hero-copy">{{ 'home.share_text'|trans }}</p></div>
+        <div class="panel"><h3>{{ 'home.organizer_space'|trans }}</h3><p class="muted">{{ 'home.organizer_features'|trans }}</p><a class="button" href="{{ app.user ? path('organizer_apply') : path('register') }}">{{ 'home.become_organizer'|trans }}</a></div>
     </div>
 </section>
 {% endblock %}

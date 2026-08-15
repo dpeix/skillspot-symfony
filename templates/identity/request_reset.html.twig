@@ -1,1 +1,3 @@
-{% extends 'base.html.twig' %}{% block title %}Mot de passe oublié — SkillSpot{% endblock %}{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">Accès au compte</p><h1>Mot de passe oublié</h1><p class="muted">Nous vous enverrons un lien temporaire.</p>{{ form_start(form) }}{{ form_widget(form) }}<button class="button">Envoyer le lien</button>{{ form_end(form) }}</div></section>{% endblock %}
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'identity.reset.request_title'|trans }}{% endblock %}
+{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">{{ 'identity.reset.request_eyebrow'|trans }}</p><h1>{{ 'identity.reset.request_heading'|trans }}</h1><p class="muted">{{ 'identity.reset.request_intro'|trans }}</p>{{ form_start(form) }}{{ form_widget(form) }}<button class="button">{{ 'identity.reset.send'|trans }}</button>{{ form_end(form) }}</div></section>{% endblock %}

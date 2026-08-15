@@ -6,6 +6,7 @@ namespace App\Identity\Domain\Entity;
 
 use App\Identity\Domain\Enum\Role;
 use App\Identity\Infrastructure\Doctrine\UserRepository;
+use App\Shared\Domain\Enum\SupportedLocale;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -43,8 +44,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
-    public function __construct(string $email, string $firstName, string $lastName, string $password = '')
-    {
+    #[ORM\Column(length: 2, enumType: SupportedLocale::class, options: ['default' => 'fr'])]
+    private SupportedLocale $preferredLocale;
+
+    public function __construct(
+        string $email,
+        string $firstName,
+        string $lastName,
+        string $password = '',
+        SupportedLocale $preferredLocale = SupportedLocale::French,
+    ) {
         if ('' === trim($email)) {
             throw new \InvalidArgumentException('The e-mail address cannot be empty.');
         }
@@ -53,6 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->lastName = trim($lastName);
         $this->password = $password;
         $this->createdAt = new \DateTimeImmutable();
+        $this->preferredLocale = $preferredLocale;
     }
 
     public function getId(): ?int
@@ -154,6 +164,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getPreferredLocale(): SupportedLocale
+    {
+        return $this->preferredLocale;
+    }
+
+    public function changePreferredLocale(SupportedLocale $locale): void
+    {
+        $this->preferredLocale = $locale;
     }
 
     public function eraseCredentials(): void

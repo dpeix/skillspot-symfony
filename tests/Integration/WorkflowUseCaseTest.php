@@ -6,6 +6,7 @@ namespace App\Tests\Integration;
 
 use App\Identity\Domain\Entity\User;
 use App\Identity\Infrastructure\Doctrine\UserRepository;
+use App\Shared\Domain\Enum\SupportedLocale;
 use App\Workshop\Application\PublishWorkshopHandler;
 use App\Workshop\Domain\Entity\Workshop;
 use App\Workshop\Domain\Entity\WorkshopSession;
@@ -29,12 +30,11 @@ final class WorkflowUseCaseTest extends KernelTestCase
             self::assertInstanceOf(User::class, $owner);
             $workshop = new Workshop(
                 $owner,
-                'Workshop ready to publish',
-                'workshop-ready-to-publish',
-                'A deliberately detailed description that proves the workshop contains enough useful information to be published safely.',
                 WorkshopCategory::Development,
                 WorkshopLevel::Intermediate,
             );
+            $workshop->addTranslation(SupportedLocale::French, 'Atelier prêt à publier', 'atelier-pret-a-publier', 'Une description volontairement détaillée qui prouve que cet atelier contient assez d’informations utiles pour être publié en toute sécurité.');
+            $workshop->addTranslation(SupportedLocale::English, 'Workshop ready to publish', 'workshop-ready-to-publish', 'A deliberately detailed description that proves the workshop contains enough useful information to be published safely.');
             new WorkshopSession(
                 $workshop,
                 new \DateTimeImmutable('2030-01-03 10:00 UTC'),

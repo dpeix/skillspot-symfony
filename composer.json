@@ -54,6 +54,7 @@
         "symfonycasts/reset-password-bundle": "^1.25",
         "symfonycasts/verify-email-bundle": "^1.18",
         "twig/extra-bundle": "^2.12|^3.0",
+        "twig/intl-extra": "^3.0",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {
@@ -104,7 +105,8 @@
         "lint": [
             "@php bin/console lint:container",
             "@php bin/console lint:twig templates",
-            "@php bin/console lint:yaml config"
+            "@php bin/console lint:yaml config translations",
+            "@php bin/console lint:translations --locale=fr --locale=en"
         ],
         "qa": [
             "@lint",

@@ -14,11 +14,13 @@ use ApiPlatform\Metadata\Get;
 )]
 final readonly class SessionResource
 {
+    /** @param array{fr: array{slug: string, title: string, description: string}, en: array{slug: string, title: string, description: string}} $workshopTranslations */
     public function __construct(
         #[ApiProperty(identifier: true)]
         public int $id,
         public string $workshopSlug,
         public string $workshopTitle,
+        public array $workshopTranslations,
         public \DateTimeImmutable $startsAt,
         public \DateTimeImmutable $endsAt,
         public int $capacity,

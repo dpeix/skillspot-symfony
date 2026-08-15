@@ -23,7 +23,7 @@ use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 final class ResetPasswordController extends AbstractController
 {
-    #[Route('/mot-de-passe-oublie', name: 'forgot_password_request', methods: ['GET', 'POST'])]
+    #[Route(path: ['fr' => '/fr/mot-de-passe-oublie', 'en' => '/en/forgot-password'], name: 'forgot_password_request', methods: ['GET', 'POST'])]
     public function request(
         Request $request,
         UserRepositoryInterface $users,
@@ -31,7 +31,7 @@ final class ResetPasswordController extends AbstractController
         MessageBusInterface $bus,
     ): Response {
         $form = $this->createFormBuilder()
-            ->add('email', EmailType::class, ['label' => 'Adresse e-mail', 'constraints' => [new Assert\NotBlank(), new Assert\Email()]])
+            ->add('email', EmailType::class, ['label' => 'identity.form.email', 'constraints' => [new Assert\NotBlank(), new Assert\Email()]])
             ->getForm()
             ->handleRequest($request);
 
@@ -47,11 +47,16 @@ final class ResetPasswordController extends AbstractController
                     $bus->dispatch(new SendTransactionalEmail(
                         $user->getEmail(),
                         $user->getDisplayName(),
-                        'Réinitialisez votre mot de passe',
-                        'Vous avez demandé un nouveau mot de passe',
-                        'Ce lien est temporaire. Ignorez cet e-mail si vous n’êtes pas à l’origine de la demande.',
-                        $this->generateUrl('reset_password', ['token' => $token->getToken()], UrlGeneratorInterface::ABSOLUTE_URL),
-                        'Choisir un mot de passe',
+                        $user->getPreferredLocale()->value,
+                        'email.reset.subject',
+                        'email.reset.heading',
+                        'email.reset.body',
+                        [],
+                        $this->generateUrl('reset_password', [
+                            '_locale' => $user->getPreferredLocale()->value,
+                            'token' => $token->getToken(),
+                        ], UrlGeneratorInterface::ABSOLUTE_URL),
+                        'email.reset.action',
                     ));
                 } catch (ResetPasswordExceptionInterface) {
                 }
@@ -63,13 +68,13 @@ final class ResetPasswordController extends AbstractController
         return $this->render('identity/request_reset.html.twig', ['form' => $form]);
     }
 
-    #[Route('/mot-de-passe-oublie/email-envoye', name: 'forgot_password_check_email', methods: ['GET'])]
+    #[Route(path: ['fr' => '/fr/mot-de-passe-oublie/email-envoye', 'en' => '/en/forgot-password/email-sent'], name: 'forgot_password_check_email', methods: ['GET'])]
     public function checkEmail(): Response
     {
         return $this->render('identity/check_email.html.twig');
     }
 
-    #[Route('/nouveau-mot-de-passe/{token}', name: 'reset_password', methods: ['GET', 'POST'])]
+    #[Route(path: ['fr' => '/fr/nouveau-mot-de-passe/{token}', 'en' => '/en/reset-password/{token}'], name: 'reset_password', methods: ['GET', 'POST'])]
     public function reset(
         string $token,
         Request $request,
@@ -91,8 +96,8 @@ final class ResetPasswordController extends AbstractController
         $form = $this->createFormBuilder()
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'first_options' => ['label' => 'Nouveau mot de passe'],
-                'second_options' => ['label' => 'Confirmer le mot de passe'],
+                'first_options' => ['label' => 'identity.reset.new_password'],
+                'second_options' => ['label' => 'identity.reset.confirm_password'],
                 'constraints' => [new Assert\Length(min: 10)],
             ])
             ->getForm()
@@ -105,7 +110,7 @@ final class ResetPasswordController extends AbstractController
             $user->changePassword($hasher->hashPassword($user, $plainPassword));
             $users->save($user);
             $resetPassword->removeResetRequest($token);
-            $this->addFlash('success', 'Votre mot de passe a été modifié.');
+            $this->addFlash('success', 'identity.flash.password_changed');
 
             return $this->redirectToRoute('app_login');
         }

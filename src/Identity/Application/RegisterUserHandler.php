@@ -21,10 +21,10 @@ final readonly class RegisterUserHandler
     public function __invoke(RegisterUserData $data): User
     {
         if ($this->users->findByEmail($data->email)) {
-            throw new BusinessRuleViolation('Un compte utilise déjà cette adresse e-mail.');
+            throw new BusinessRuleViolation('identity.error.email_already_used');
         }
 
-        $user = new User($data->email, $data->firstName, $data->lastName);
+        $user = new User($data->email, $data->firstName, $data->lastName, preferredLocale: $data->preferredLocale);
         $user->changePassword($this->passwordHasher->hashPassword($user, $data->plainPassword));
         $this->users->save($user);
 

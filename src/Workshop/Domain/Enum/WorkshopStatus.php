@@ -9,4 +9,9 @@ enum WorkshopStatus: string
     case Draft = 'draft';
     case Published = 'published';
     case Archived = 'archived';
+
+    public function labelKey(): string
+    {
+        return 'enum.workshop_status.'.$this->value;
+    }
 }

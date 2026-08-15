@@ -29,7 +29,7 @@ final readonly class CancelSessionHandler
     public function __invoke(WorkshopSession $session, User $organizer): void
     {
         if ($session->getWorkshop()->getOwner() !== $organizer) {
-            throw new BusinessRuleViolation('Vous ne pouvez pas annuler cette session.');
+            throw new BusinessRuleViolation('session.error.cannot_cancel');
         }
 
         $session->cancel();

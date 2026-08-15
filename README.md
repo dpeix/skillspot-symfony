@@ -9,6 +9,7 @@ SkillSpot is a full-stack Symfony platform for discovering and booking free work
 ## What it demonstrates
 
 - A public, filterable workshop catalogue built with Twig Components, Turbo, Stimulus and custom responsive CSS.
+- Complete French/English localization: translated URLs, persistent language preference, localized SEO metadata, bilingual workshop content and recipient-aware e-mails.
 - Verified accounts with password reset, role-based workspaces, voters and a reviewed organizer application workflow.
 - Transactional booking rules: capacity, schedule conflicts, a 24-hour cancellation deadline and FIFO waitlist promotion.
 - Organizer tools for sessions, participants, attendance and computed performance metrics.
@@ -42,6 +43,20 @@ The booking transaction locks its session row before reading capacity. A Postgre
 - A workshop cannot be published without a future, bookable session.
 - Only the owning organizer or an administrator can manage a workshop.
 - Attendance can only be recorded for confirmed bookings after a session completes.
+- French and English workshop translations are both required before publication; their slugs remain stable after creation.
+
+## Languages and localized URLs
+
+The web interface is available in French and English. `/` selects the best locale from the signed-in account, the `skillspot_locale` cookie or `Accept-Language`, with French as the fallback. The accessible `FR | EN` switch stores the preference for one year and preserves catalogue filters or the translated workshop slug.
+
+```text
+/fr/ateliers/symfony-sans-magie-noire
+/en/workshops/symfony-without-black-magic
+/fr/tableau-de-bord
+/en/dashboard
+```
+
+Public pages expose canonical, `hreflang="fr"`, `hreflang="en"` and `x-default` links. Dates are stored in UTC and rendered for `Europe/Paris` using the active locale. `/api/*` and `/healthz` deliberately remain unprefixed.
 
 ## Run locally
 
@@ -90,7 +105,18 @@ GET /api/sessions/{id}
 GET /healthz
 ```
 
-The API is intentionally read-only. Booking writes remain protected by the web firewall and CSRF tokens.
+The API is intentionally read-only. Booking writes remain protected by the web firewall and CSRF tokens. Existing top-level `slug`, `title` and `description` fields remain French for compatibility; every workshop and workshop reference also exposes both localized versions:
+
+```json
+{
+  "slug": "symfony-sans-magie-noire",
+  "title": "Symfony sans magie noire",
+  "translations": {
+    "fr": {"slug": "symfony-sans-magie-noire", "title": "Symfony sans magie noire", "description": "..."},
+    "en": {"slug": "symfony-without-black-magic", "title": "Symfony without black magic", "description": "..."}
+  }
+}
+```
 
 ## Tests and quality
 
@@ -101,7 +127,7 @@ docker compose exec php composer analyse
 docker compose exec php composer test
 ```
 
-The test suite covers domain invariants, the transactional booking/promotion use cases, authorization and the main BrowserKit user journeys. CI also validates Doctrine mapping, compiles AssetMapper assets and builds the final production image.
+The test suite covers domain invariants, translated-content constraints, localized repositories and URLs, recipient-language e-mails, the transactional booking/promotion use cases, authorization and French/English BrowserKit journeys. CI also validates Doctrine mapping, compiles AssetMapper assets and builds the final production image.
 
 ## Production deployment
 

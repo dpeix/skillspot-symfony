@@ -21,7 +21,7 @@ final readonly class VerifyEmailHandler
     {
         $user = $this->users->get($userId);
         if (!$user) {
-            throw new BusinessRuleViolation('Ce lien de confirmation est invalide.');
+            throw new BusinessRuleViolation('identity.error.invalid_verification_link');
         }
 
         $this->verifyEmail->validateEmailConfirmationFromRequest($request, (string) $userId, $user->getEmail());

@@ -46,7 +46,7 @@ class OrganizerApplication
     public function __construct(User $applicant, string $motivation, ?\DateTimeImmutable $createdAt = null)
     {
         if (mb_strlen(trim($motivation)) < 40) {
-            throw new BusinessRuleViolation('Votre motivation doit contenir au moins 40 caractères.');
+            throw new BusinessRuleViolation('organizer.application.error.motivation_too_short');
         }
 
         $this->applicant = $applicant;
@@ -87,7 +87,7 @@ class OrganizerApplication
     public function recordDecision(User $reviewer, ?string $note, \DateTimeImmutable $now): void
     {
         if (OrganizerApplicationStatus::Pending !== $this->getStatus()) {
-            throw new BusinessRuleViolation('Cette demande a déjà été traitée.');
+            throw new BusinessRuleViolation('organizer.application.error.already_reviewed');
         }
 
         $this->reviewedBy = $reviewer;

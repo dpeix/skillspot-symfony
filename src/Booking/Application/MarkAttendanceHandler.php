@@ -22,7 +22,7 @@ final readonly class MarkAttendanceHandler
     public function __invoke(Booking $booking, User $organizer, AttendanceStatus $attendance): void
     {
         if ($booking->getSession()->getWorkshop()->getOwner() !== $organizer) {
-            throw new BusinessRuleViolation('Vous ne pouvez pas émarger cette réservation.');
+            throw new BusinessRuleViolation('booking.error.cannot_mark_attendance');
         }
 
         $booking->markAttendance($attendance, $this->clock->now());

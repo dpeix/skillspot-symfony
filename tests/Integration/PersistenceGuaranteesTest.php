@@ -9,7 +9,11 @@ use App\Booking\Domain\Enum\BookingStatus;
 use App\Booking\Infrastructure\Doctrine\BookingRepository;
 use App\Identity\Domain\Entity\User;
 use App\Identity\Infrastructure\Doctrine\UserRepository;
+use App\Shared\Domain\Enum\SupportedLocale;
+use App\Workshop\Domain\Entity\Workshop;
 use App\Workshop\Domain\Entity\WorkshopSession;
+use App\Workshop\Domain\Enum\WorkshopCategory;
+use App\Workshop\Domain\Enum\WorkshopLevel;
 use App\Workshop\Infrastructure\Doctrine\WorkshopSessionRepository;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\DriverException;
@@ -19,6 +23,29 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class PersistenceGuaranteesTest extends KernelTestCase
 {
+    public function testDatabaseRejectsDuplicateSlugsWithinALocale(): void
+    {
+        self::bootKernel();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->getConnection()->beginTransaction();
+
+        try {
+            $owner = self::getContainer()->get(UserRepository::class)->findByEmail('organizer@skillspot.local');
+            self::assertInstanceOf(User::class, $owner);
+            $workshop = new Workshop($owner, WorkshopCategory::Development, WorkshopLevel::Beginner);
+            $workshop->addTranslation(SupportedLocale::French, 'Un autre atelier Symfony', 'symfony-sans-magie-noire', 'Une autre description française suffisamment longue pour respecter le contrat métier imposé aux contenus des ateliers SkillSpot.');
+            $workshop->addTranslation(SupportedLocale::English, 'Another Symfony workshop', 'another-symfony-workshop', 'Another English description that is deliberately long enough to satisfy the business contract applied to SkillSpot workshop content.');
+            $entityManager->persist($workshop);
+
+            $this->expectException(UniqueConstraintViolationException::class);
+            $entityManager->flush();
+        } finally {
+            if ($entityManager->getConnection()->isTransactionActive()) {
+                $entityManager->getConnection()->rollBack();
+            }
+        }
+    }
+
     public function testDatabaseRejectsDuplicateBookings(): void
     {
         self::bootKernel();

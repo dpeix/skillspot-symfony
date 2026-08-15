@@ -1,18 +1,19 @@
 {% set nextSession = workshop.sessions|first %}
+{% set translation = workshop.translation(app.request.locale) %}
 <article class="workshop-card">
-    <a href="{{ path('workshop_show', {slug: workshop.slug}) }}" class="card-link">
+    <a href="{{ path('workshop_show', {slug: translation.slug}) }}" class="card-link">
         <div class="card-accent card-accent-{{ workshop.category.value }}"></div>
         <div class="card-body">
             <div class="tag-row">
-                <span class="tag">{{ workshop.category.label }}</span>
-                <span class="tag tag-muted">{{ workshop.level.label }}</span>
+                <span class="tag">{{ workshop.category.labelKey|trans }}</span>
+                <span class="tag tag-muted">{{ workshop.level.labelKey|trans }}</span>
             </div>
-            <h3>{{ workshop.title }}</h3>
-            <p>{{ workshop.description|length > 125 ? workshop.description|slice(0, 125) ~ '…' : workshop.description }}</p>
+            <h3>{{ translation.title }}</h3>
+            <p>{{ translation.description|length > 125 ? translation.description|slice(0, 125) ~ '…' : translation.description }}</p>
             {% if nextSession %}
                 <div class="card-meta">
-                    <strong>{{ nextSession.startsAt|date('d M', 'Europe/Paris') }}</strong>
-                    <span>{{ nextSession.mode.label }}</span>
+                    <strong>{{ nextSession.startsAt|format_datetime(pattern: 'd MMM', timezone: 'Europe/Paris', locale: app.request.locale) }}</strong>
+                    <span>{{ nextSession.mode.labelKey|trans }}</span>
                 </div>
             {% endif %}
         </div>

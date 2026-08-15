@@ -1,1 +1,3 @@
-{% extends 'base.html.twig' %}{% block title %}E-mail envoyé — SkillSpot{% endblock %}{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">E-mail envoyé</p><h1>Consultez votre boîte de réception</h1><p>Si un compte correspond à cette adresse, un lien de réinitialisation vient d’être envoyé.</p><a href="{{ path('app_login') }}">Retour à la connexion</a></div></section>{% endblock %}
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'identity.reset.sent_title'|trans }}{% endblock %}
+{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">{{ 'identity.reset.sent_eyebrow'|trans }}</p><h1>{{ 'identity.reset.sent_heading'|trans }}</h1><p>{{ 'identity.reset.sent_text'|trans }}</p><a href="{{ path('app_login') }}">{{ 'identity.reset.back'|trans }}</a></div></section>{% endblock %}

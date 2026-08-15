@@ -27,11 +27,9 @@ final readonly class MessengerTransactionalNotifier implements TransactionalNoti
         $confirmed = BookingStatus::Confirmed === $booking->getStatus();
         $this->dispatch(
             $booking,
-            $confirmed ? 'Réservation confirmée' : 'Vous êtes sur liste d’attente',
-            $confirmed ? 'Votre place est réservée' : 'Votre demande est enregistrée',
-            $confirmed
-                ? 'Votre place pour « '.$booking->getSession()->getWorkshop()->getTitle().' » est confirmée.'
-                : 'La session est complète. Nous vous préviendrons automatiquement si une place se libère.',
+            $confirmed ? 'email.booking.confirmed.subject' : 'email.booking.waitlisted.subject',
+            $confirmed ? 'email.booking.confirmed.heading' : 'email.booking.waitlisted.heading',
+            $confirmed ? 'email.booking.confirmed.body' : 'email.booking.waitlisted.body',
         );
     }
 
@@ -39,9 +37,9 @@ final readonly class MessengerTransactionalNotifier implements TransactionalNoti
     {
         $this->dispatch(
             $booking,
-            'Une place vient de se libérer',
-            'Votre réservation est maintenant confirmée',
-            'Bonne nouvelle : vous participerez à « '.$booking->getSession()->getWorkshop()->getTitle().' ».',
+            'email.booking.promoted.subject',
+            'email.booking.promoted.heading',
+            'email.booking.promoted.body',
         );
     }
 
@@ -49,9 +47,9 @@ final readonly class MessengerTransactionalNotifier implements TransactionalNoti
     {
         $this->dispatch(
             $booking,
-            'Réservation annulée',
-            'Votre annulation est enregistrée',
-            'Votre réservation pour « '.$booking->getSession()->getWorkshop()->getTitle().' » a bien été annulée.',
+            'email.booking.cancelled.subject',
+            'email.booking.cancelled.heading',
+            'email.booking.cancelled.body',
         );
     }
 
@@ -59,9 +57,10 @@ final readonly class MessengerTransactionalNotifier implements TransactionalNoti
     {
         $this->dispatch(
             $booking,
-            'Votre atelier commence demain',
-            'Rendez-vous dans 24 heures',
-            '« '.$booking->getSession()->getWorkshop()->getTitle().' » commence le '.$booking->getSession()->getStartsAt()->setTimezone(new \DateTimeZone('Europe/Paris'))->format('d/m/Y à H:i').'.',
+            'email.booking.reminder.subject',
+            'email.booking.reminder.heading',
+            'email.booking.reminder.body',
+            date: $booking->getSession()->getStartsAt(),
         );
     }
 
@@ -70,9 +69,10 @@ final readonly class MessengerTransactionalNotifier implements TransactionalNoti
         foreach ($bookings as $booking) {
             $this->dispatch(
                 $booking,
-                'Session annulée',
-                'La session ne pourra pas avoir lieu',
-                'La session de « '.$session->getWorkshop()->getTitle().' » prévue le '.$session->getStartsAt()->setTimezone(new \DateTimeZone('Europe/Paris'))->format('d/m/Y').' est annulée.',
+                'email.session_cancelled.subject',
+                'email.session_cancelled.heading',
+                'email.session_cancelled.body',
+                date: $session->getStartsAt(),
             );
         }
     }
@@ -81,30 +81,43 @@ final readonly class MessengerTransactionalNotifier implements TransactionalNoti
     {
         $approved = OrganizerApplicationStatus::Approved === $application->getStatus();
         $user = $application->getApplicant();
+        $locale = $user->getPreferredLocale()->value;
         $this->bus->dispatch(new SendTransactionalEmail(
             $user->getEmail(),
             $user->getDisplayName(),
-            $approved ? 'Votre demande organisateur est acceptée' : 'Décision concernant votre demande organisateur',
-            $approved ? 'Bienvenue parmi les organisateurs' : 'Votre demande n’a pas été retenue',
-            $approved
-                ? 'Vous pouvez désormais créer et publier vos ateliers sur SkillSpot.'
-                : 'Vous pourrez soumettre une nouvelle demande après avoir complété votre projet.',
-            $this->urls->generate($approved ? 'organizer_dashboard' : 'home', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'Accéder à SkillSpot',
+            $locale,
+            $approved ? 'email.organizer.approved.subject' : 'email.organizer.rejected.subject',
+            $approved ? 'email.organizer.approved.heading' : 'email.organizer.rejected.heading',
+            $approved ? 'email.organizer.approved.body' : 'email.organizer.rejected.body',
+            [],
+            $this->urls->generate($approved ? 'organizer_dashboard' : 'home', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
+            'email.organizer.action',
         ));
     }
 
-    private function dispatch(Booking $booking, string $subject, string $heading, string $body): void
-    {
+    /** @param array<string, scalar> $parameters */
+    private function dispatch(
+        Booking $booking,
+        string $subjectKey,
+        string $headingKey,
+        string $bodyKey,
+        array $parameters = [],
+        ?\DateTimeImmutable $date = null,
+    ): void {
         $attendee = $booking->getAttendee();
+        $locale = $attendee->getPreferredLocale();
+        $workshopTitle = $booking->getSession()->getWorkshop()->translation($locale)->getTitle();
         $this->bus->dispatch(new SendTransactionalEmail(
             $attendee->getEmail(),
             $attendee->getDisplayName(),
-            $subject,
-            $heading,
-            $body,
-            $this->urls->generate('attendee_dashboard', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'Voir mes réservations',
+            $locale->value,
+            $subjectKey,
+            $headingKey,
+            $bodyKey,
+            ['workshop' => $workshopTitle, ...$parameters],
+            $this->urls->generate('attendee_dashboard', ['_locale' => $locale->value], UrlGeneratorInterface::ABSOLUTE_URL),
+            'email.booking.action',
+            $date,
         ));
     }
 }

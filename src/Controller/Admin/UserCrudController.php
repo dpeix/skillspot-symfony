@@ -24,7 +24,7 @@ class UserCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('utilisateur')->setEntityLabelInPlural('utilisateurs');
+        return $crud->setEntityLabelInSingular('admin.user.singular')->setEntityLabelInPlural('admin.user.plural');
     }
 
     public function configureActions(Actions $actions): Actions
@@ -36,11 +36,12 @@ class UserCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            TextField::new('email', 'E-mail'),
-            TextField::new('firstName', 'Prénom'),
-            TextField::new('lastName', 'Nom'),
-            BooleanField::new('verified', 'Vérifié'),
-            ArrayField::new('roles', 'Rôles'),
+            TextField::new('email', 'admin.user.email'),
+            TextField::new('firstName', 'admin.user.first_name'),
+            TextField::new('lastName', 'admin.user.last_name'),
+            TextField::new('preferredLocale.value', 'admin.user.locale'),
+            BooleanField::new('verified', 'admin.user.verified'),
+            ArrayField::new('roles', 'admin.user.roles'),
         ];
     }
 }

@@ -19,16 +19,16 @@ final class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstName', null, ['label' => 'Prénom'])
-            ->add('lastName', null, ['label' => 'Nom'])
-            ->add('email', EmailType::class, ['label' => 'Adresse e-mail'])
+            ->add('firstName', null, ['label' => 'identity.form.first_name'])
+            ->add('lastName', null, ['label' => 'identity.form.last_name'])
+            ->add('email', EmailType::class, ['label' => 'identity.form.email'])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'first_options' => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Confirmer le mot de passe'],
-                'invalid_message' => 'Les mots de passe doivent être identiques.',
+                'first_options' => ['label' => 'identity.form.password'],
+                'second_options' => ['label' => 'identity.form.password_confirmation'],
+                'invalid_message' => 'identity.validation.passwords_match',
             ])
-            ->add('agreeTerms', CheckboxType::class, ['label' => 'J’accepte les conditions d’utilisation']);
+            ->add('agreeTerms', CheckboxType::class, ['label' => 'identity.form.agree_terms']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

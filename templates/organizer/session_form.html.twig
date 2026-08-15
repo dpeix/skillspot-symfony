@@ -1,1 +1,3 @@
-{% extends 'base.html.twig' %}{% block title %}Planifier une session — SkillSpot{% endblock %}{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">{{ workshop.title }}</p><h1>Planifier une session</h1><p class="muted">Les heures saisies sont affichées dans le fuseau Europe/Paris.</p>{{ form_start(form) }}{{ form_widget(form) }}<button class="button">Ajouter la session</button>{{ form_end(form) }}</div></section>{% endblock %}
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'session.form.title'|trans }} — SkillSpot{% endblock %}
+{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">{{ workshop.translation(app.request.locale).title }}</p><h1>{{ 'session.form.title'|trans }}</h1><p class="muted">{{ 'session.form.timezone_help'|trans }}</p>{{ form_start(form) }}{{ form_widget(form) }}<button class="button">{{ 'session.form.submit'|trans }}</button>{{ form_end(form) }}</div></section>{% endblock %}
