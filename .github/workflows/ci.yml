@@ -34,7 +34,7 @@ jobs:
       MERCURE_PUBLIC_URL: https://example.test/.well-known/mercure
       MERCURE_JWT_SECRET: ci-mercure-secret
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Install PHP extensions
         run: install-php-extensions pdo_pgsql intl zip
       - name: Install dependencies
@@ -60,6 +60,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Build production image
         run: docker build --target frankenphp_prod --tag skillspot:ci .
