@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+{% block title %}Connexion — SkillSpot{% endblock %}
+{% block body %}<section class="auth-shell"><div class="auth-card"><p class="eyebrow">Heureux de vous revoir</p><h1>Connexion</h1>
+    {% if error %}<div class="flash flash-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>{% endif %}
+    <form method="post"><div class="form-row"><label for="email">Adresse e-mail</label><input class="form-control" type="email" id="email" name="email" value="{{ last_username }}" autocomplete="email" required autofocus></div><div class="form-row"><label for="password">Mot de passe</label><input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required></div><div class="form-row"><label><input type="checkbox" name="_remember_me"> Rester connecté</label></div><input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"><button class="button" type="submit">Se connecter</button></form>
+    <p style="margin-top:1.5rem"><a href="{{ path('forgot_password_request') }}">Mot de passe oublié ?</a></p><p class="muted">Pas encore membre ? <a href="{{ path('register') }}">Créer un compte</a></p>
+</div></section>{% endblock %}

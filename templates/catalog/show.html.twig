@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ workshop.title }} — SkillSpot{% endblock %}
+{% block body %}
+<section class="dashboard-header"><div class="container"><div class="tag-row"><span class="tag">{{ workshop.category.label }}</span><span class="tag tag-muted">{{ workshop.level.label }}</span></div><h1>{{ workshop.title }}</h1><p class="muted">Animé par {{ workshop.owner.displayName }}</p></div></section>
+<section class="section" style="padding-top:1rem"><div class="container detail-grid">
+    <article class="panel"><h2>À propos de cet atelier</h2><div class="prose">{{ workshop.description }}</div></article>
+    <aside><div class="panel"><div class="panel-heading"><div><p class="eyebrow">Sessions</p><h2 style="font-size:1.7rem">Choisissez une date</h2></div></div>
+        <div class="session-list">
+        {% for session in workshop.sessions %}
+            {% if session.status.value == 'scheduled' and session.startsAt > date() %}
+            <div class="session-card" data-controller="availability" data-availability-url-value="{{ mercure('/sessions/' ~ session.id ~ '/availability') }}">
+                <div class="session-top"><div><strong>{{ session.startsAt|date('d/m/Y à H:i', 'Europe/Paris') }}</strong><div class="muted">{{ session.mode.label }} · {{ session.endsAt|date('H:i', 'Europe/Paris') }}</div></div><span class="tag">{{ session.capacity }} places</span></div>
+                <p class="availability"><span data-availability-target="count">{{ session.remainingSeats }}</span> <span data-availability-target="label">{{ session.remainingSeats > 0 ? 'places disponibles' : 'liste d’attente' }}</span></p>
+                {% if app.user %}
+                    <form method="post" action="{{ path('booking_create', {id: session.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('book-' ~ session.id) }}"><button class="button button-small" type="submit">{{ session.remainingSeats > 0 ? 'Réserver ma place' : 'Rejoindre la liste' }}</button></form>
+                {% else %}
+                    <a class="button button-small" href="{{ path('app_login') }}">Se connecter pour réserver</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% else %}<p class="muted">Aucune session programmée.</p>{% endfor %}
+        </div>
+    </div></aside>
+</div></section>
+{% endblock %}

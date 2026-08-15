@@ -1,0 +1,14 @@
+api_platform:
+    title: SkillSpot Public API
+    description: Read-only access to published workshops and their sessions.
+    version: 1.0.0
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    defaults:
+        stateless: true
+        pagination_items_per_page: 12
+        pagination_maximum_items_per_page: 24
+        pagination_client_items_per_page: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']

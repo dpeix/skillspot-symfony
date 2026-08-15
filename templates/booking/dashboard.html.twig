@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mes réservations — SkillSpot{% endblock %}
+{% block body %}
+<section class="dashboard-header"><div class="container"><p class="eyebrow">Espace participant</p><h1>Bonjour {{ app.user.firstName }}</h1><p class="hero-copy">Retrouvez vos prochaines sessions et leur statut.</p></div></section>
+<section class="section" style="padding-top:1rem"><div class="container">
+    <div class="section-heading"><h2>Mes réservations</h2><a class="button button-secondary" href="{{ path('workshop_catalog') }}">Découvrir un atelier</a></div>
+    {% if bookings %}<div class="data-list">
+        {% for booking in bookings %}<article class="data-row"><div><div class="tag-row"><span class="tag {{ booking.status.value == 'cancelled' ? 'tag-danger' : (booking.status.value == 'confirmed' ? 'tag-success' : '') }}">{{ booking.status.label }}</span></div><h3><a href="{{ path('workshop_show', {slug: booking.session.workshop.slug}) }}">{{ booking.session.workshop.title }}</a></h3><span class="muted">{{ booking.session.mode.label }}</span>{% if booking.status.value == 'confirmed' and booking.session.mode.value == 'online' and booking.session.meetingUrl %}<div><a href="{{ booking.session.meetingUrl }}" rel="noopener noreferrer">Accéder à la visioconférence</a></div>{% endif %}</div><div><strong>{{ booking.session.startsAt|date('d/m/Y à H:i', 'Europe/Paris') }}</strong><div class="muted">Fin à {{ booking.session.endsAt|date('H:i', 'Europe/Paris') }}</div></div><div class="actions">{% if booking.status.value != 'cancelled' and booking.session.startsAt > date('+24 hours') %}<form method="post" action="{{ path('booking_cancel', {id: booking.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('cancel-booking-' ~ booking.id) }}"><button class="button button-danger button-small">Annuler</button></form>{% endif %}</div></article>{% endfor %}
+    </div>{% else %}<div class="empty-state"><h3>Aucune réservation</h3><p>Votre prochain apprentissage n’attend que vous.</p><a class="button" href="{{ path('workshop_catalog') }}">Explorer le catalogue</a></div>{% endif %}
+    {% if not is_granted('ROLE_ORGANIZER') %}<div class="panel" style="margin-top:2rem"><div class="panel-heading"><div><p class="eyebrow">Vous souhaitez transmettre ?</p><h3>Proposez votre propre atelier</h3></div><a class="button button-secondary" href="{{ path('organizer_apply') }}">Devenir organisateur</a></div></div>{% endif %}
+</div></section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% set nextSession = workshop.sessions|first %}
+<article class="workshop-card">
+    <a href="{{ path('workshop_show', {slug: workshop.slug}) }}" class="card-link">
+        <div class="card-accent card-accent-{{ workshop.category.value }}"></div>
+        <div class="card-body">
+            <div class="tag-row">
+                <span class="tag">{{ workshop.category.label }}</span>
+                <span class="tag tag-muted">{{ workshop.level.label }}</span>
+            </div>
+            <h3>{{ workshop.title }}</h3>
+            <p>{{ workshop.description|length > 125 ? workshop.description|slice(0, 125) ~ '…' : workshop.description }}</p>
+            {% if nextSession %}
+                <div class="card-meta">
+                    <strong>{{ nextSession.startsAt|date('d M', 'Europe/Paris') }}</strong>
+                    <span>{{ nextSession.mode.label }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </a>
+</article>

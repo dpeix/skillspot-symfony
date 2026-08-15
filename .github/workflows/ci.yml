@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    container: dunglas/frankenphp:1-php8.5
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: app_test
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: test-password
+        options: >-
+          --health-cmd "pg_isready -U app -d app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      APP_ENV: test
+      APP_SECRET: ci-test-secret
+      DATABASE_URL: postgresql://app:test-password@postgres:5432/app_test?serverVersion=16&charset=utf8
+      MAILER_DSN: null://null
+      MAILER_FROM: no-reply@skillspot.test
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
+      MERCURE_URL: https://example.test/.well-known/mercure
+      MERCURE_PUBLIC_URL: https://example.test/.well-known/mercure
+      MERCURE_JWT_SECRET: ci-mercure-secret
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install PHP extensions
+        run: install-php-extensions pdo_pgsql intl zip
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Prepare test database
+        run: |
+          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+          php bin/console doctrine:fixtures:load --env=test --no-interaction
+      - name: Validate application
+        run: |
+          composer validate --strict
+          composer lint
+          php bin/console doctrine:schema:validate --env=test
+          php bin/console asset-map:compile
+      - name: Check code style
+        run: composer cs-check
+      - name: Static analysis
+        run: composer analyse
+      - name: Tests
+        run: composer test
+
+  production-image:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build production image
+        run: docker build --target frankenphp_prod --tag skillspot:ci .

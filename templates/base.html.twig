@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="SkillSpot, des ateliers concrets animés par des passionnés.">
+        <title>{% block title %}SkillSpot{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%234f46e5%22/><path d=%22M18 22h28M18 32h20M18 42h14%22 stroke=%22white%22 stroke-width=%226%22 stroke-linecap=%22round%22/></svg>">
+        {% block stylesheets %}{% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+
+        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+        {% if frankenphp_hot_reload %}
+        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
+        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
+        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
+        {% endif %}
+    </head>
+    <body>
+        <a class="skip-link" href="#main-content">Aller au contenu</a>
+        <header class="site-header">
+            <div class="container nav-wrap">
+                <a href="{{ path('home') }}" class="brand" aria-label="Accueil SkillSpot"><span class="brand-mark">S</span>SkillSpot</a>
+                <nav aria-label="Navigation principale">
+                    <a href="{{ path('workshop_catalog') }}">Ateliers</a>
+                    {% if app.user %}
+                        <a href="{{ path('attendee_dashboard') }}">Mes réservations</a>
+                        {% if is_granted('ROLE_ORGANIZER') %}<a href="{{ path('organizer_dashboard') }}">Espace organisateur</a>{% endif %}
+                        {% if is_granted('ROLE_ADMIN') %}<a href="{{ path('admin') }}">Administration</a>{% endif %}
+                        <a href="{{ path('app_logout') }}" class="button button-ghost">Déconnexion</a>
+                    {% else %}
+                        <a href="{{ path('app_login') }}">Connexion</a>
+                        <a href="{{ path('register') }}" class="button button-small">Créer un compte</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+        <main id="main-content">
+            <div class="container flashes" aria-live="polite">
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}<div class="flash flash-{{ type }}">{{ message }}</div>{% endfor %}
+                {% endfor %}
+            </div>
+            {% block body %}{% endblock %}
+        </main>
+        <footer class="site-footer">
+            <div class="container footer-wrap"><span>© {{ 'now'|date('Y') }} SkillSpot</span><span>Construit avec Symfony, PostgreSQL et FrankenPHP.</span></div>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+framework:
+    workflows:
+        organizer_application:
+            type: state_machine
+            supports: App\Identity\Domain\Entity\OrganizerApplication
+            marking_store:
+                type: method
+                property: workflowState
+            initial_marking: pending
+            places: [pending, approved, rejected]
+            transitions:
+                approve: { from: pending, to: approved }
+                reject: { from: pending, to: rejected }
+        workshop:
+            type: state_machine
+            supports: App\Workshop\Domain\Entity\Workshop
+            marking_store:
+                type: method
+                property: workflowState
+            initial_marking: draft
+            places: [draft, published, archived]
+            transitions:
+                publish: { from: draft, to: published }
+                archive: { from: [draft, published], to: archived }
